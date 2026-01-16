@@ -22,28 +22,38 @@ export async function checkGitStatus() {
 }
 
 /**
- * Stages, commits, and pushes a list of files.
- * If limit is provided, only processes the top N files.
+ * Stages and commits all files in a single batch.
  */
-export async function processFiles(files, limit = 5) {
+export async function processFiles(files) {
     if (!files || files.length === 0) {
         console.log(chalk.yellow('No files to process.'));
         return;
     }
 
-    const filesToProcess = limit ? files.slice(0, limit) : files;
-    console.log(chalk.green(`Processing ${filesToProcess.length} files...`));
+    console.log(chalk.green(`Processing ${files.length} files...`));
+    const spinner = ora('Committing files...').start();
 
-    for (const file of filesToProcess) {
-        const spinner = ora(`Processing ${file.path}...`).start();
-        try {
-            await git.add(file.path);
-            const message = `Update ${file.path}: Automated sync ${new Date().toISOString()}`;
-            await git.commit(message);
-            spinner.succeed(`Committed: ${file.path}`);
-        } catch (error) {
-            spinner.fail(`Failed to commit ${file.path}: ${error.message}`);
+    try {
+        // Add all files
+        await git.add('.');
+
+        // Generate message
+        // Format: "Update: file1, file2... and N others"
+        const fileNames = files.map(f => f.path);
+        let messageBody = '';
+        if (fileNames.length <= 2) {
+            messageBody = fileNames.join(', ');
+        } else {
+            messageBody = `${fileNames.slice(0, 2).join(', ')} and ${fileNames.length - 2} others`;
         }
+
+        const commitMessage = `Update: ${messageBody}`;
+
+        await git.commit(commitMessage);
+        spinner.succeed(`Committed: ${commitMessage}`);
+    } catch (error) {
+        spinner.fail(`Failed to commit: ${error.message}`);
+        throw error; // Re-throw to handle in main loop
     }
 }
 
@@ -153,28 +163,6 @@ export async function pushChanges() {
             spinner.fail(`Failed to push changes: ${error.message}`);
         }
     }
-}
-
-/**
- * Polls for changes until the number of changed files meets the threshold.
- */
-export async function waitForThreshold(threshold = 5) {
-    const spinner = ora(`Waiting for ${threshold} unstaged files...`).start();
-
-    return new Promise((resolve) => {
-        const interval = setInterval(async () => {
-            const files = await checkGitStatus();
-            const count = files ? files.length : 0;
-
-            spinner.text = `Waiting for ${threshold} unstaged files... (Current: ${count})`;
-
-            if (count >= threshold) {
-                clearInterval(interval);
-                spinner.succeed(`Threshold reached! Found ${count} files.`);
-                resolve(files);
-            }
-        }, 5000); // Check every 5 seconds
-    });
 }
 
 export async function getBranches() {

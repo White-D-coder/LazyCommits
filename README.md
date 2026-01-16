@@ -1,48 +1,31 @@
-# Auto Git Pusher 🚀
+# LazyCommits 🚀
 
-**Because typing `git push` is just too much work.**
+**Keeps your GitHub contribution graph active and green, naturally.** 🟩
 
-Let's be real. I’m a developer. You’re a developer. We solve complex problems all day. But you know what’s annoying? Manually committing and pushing code every 5 minutes just to save your work. 
+Built for **fun** and **peak developer laziness**, **LazyCommits** automates your pushes so you don't have to. Instead of spamming 100 robotic commits at once, it waits for random, human-like intervals (20-45 mins) and groups your work into meaningful batches. It even caps itself at ~20 commits a day so you don't look suspicious. 🕵️‍♂️
 
-I got tired of it. So I built this. Well, I told an AI to build it, and here we are. It’s the peak of engineering laziness.
+**Made by: Deeptanu Bhunia** 👨‍💻
 
-## Why Does This Exist?
+## 🛠️ Built With
 
-I have better things to do than babysit my terminal. This tool watches my code like a hawk (or a very bored security guard). When it sees I've done enough work (precisely 5 files worth of "work"), it yeets it to GitHub automatically.
+| Tech | Role | Emoji |
+| :--- | :--- | :--- |
+| **Node.js** | The Brain | 🧠 |
+| **Simple Git** | The Muscle | 💪 |
+| **Inquirer.js** | The Talker | 🗣️ |
 
-| The Old Way (Boring) | The Auto-Pusher Way (Genius) |
-| :--- | :--- |
-| Type `git add .` | Do nothing. |
-| Type `git commit -m "stuff"` | Still doing nothing. |
-| Type `git push` | Sip coffee. |
-| Realize you forgot a file | It's already handled. |
-| **Effort: 100%** | **Effort: 0%** |
+## 🏃‍♂️ How to Run
 
-## How I Made This
+You have two ways to use this magic:
 
-I literally just asked an AI agent to "make a thing that pushes my code when I'm too lazy to do it." We went back and forth, I told it to handle errors (because obviously things break), and we added a "watch mode" so it runs forever.
+| Method | Description | Command |
+| :--- | :--- | :--- |
+| **Quick Start** | Run it directly from the folder. | `npm start` |
+| **CLI Mode** | Install it globally so you can run it anywhere. | `npm link`<br>then run `deep` |
 
-It’s not rocket science. It’s just smarter than doing it manually.
+### ⚡ Step-by-Step
+1.  **Install dependencies**: `npm install` 📦
+2.  **Pick your mode** (see table above). 👆
+3.  **Select a branch** and relax. 🧘‍♂️
 
-## How to Run It
-
-You barely need to do anything.
-
-1. **Install dependencies** (do this once):
-   ```bash
-   npm install
-   ```
-2. **Start the magic**:
-   ```bash
-   npm start
-   ```
-3. **Select your branch** from the list.
-4. **Go back to coding.** 
-
-The tool will sit in the background. When you change 5 files, it wakes up, pushes them, and goes back to sleep.
-
-## Technical Details (For Nerds Only)
-*   It uses Node.js.
-*   It uses `simple-git`.
-*   It has a loop.
-*   That’s it. Bye.
+It runs in the background, pushes your code, and handles the boring stuff. Bye! 👋
