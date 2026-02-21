@@ -7,9 +7,20 @@
     "deep": "src/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
-  "keywords": [],
+  "jest": {
+    "transform": {}
+  },
+  "keywords": [
+    "git",
+    "automation",
+    "lazy",
+    "commits",
+    "stealth",
+    "human-like"
+  ],
   "author": "Deeptanu Bhunia",
   "license": "ISC",
   "description": "A human-like git automation tool that batches commits and respects daily limits.",
@@ -20,5 +31,8 @@
     "lazycommits": "^1.0.0",
     "ora": "^8.0.0",
     "simple-git": "^3.22.0"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
   }
 }

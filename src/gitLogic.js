@@ -21,8 +21,10 @@ export async function checkGitStatus() {
     }
 }
 
+import { configManager } from './config.js';
+
 /**
- * Stages and commits all files in a single batch.
+ * Stages and commits a smart chunk of files in a single batch.
  */
 export async function processFiles(files) {
     if (!files || files.length === 0) {
@@ -30,24 +32,35 @@ export async function processFiles(files) {
         return;
     }
 
-    console.log(chalk.green(`Processing ${files.length} files...`));
+    const config = configManager.loadConfig();
+    const { enabled, minFiles, maxFiles } = config.chunking;
+
+    // Determine how many files to pick
+    let filesToCommit = files;
+    if (enabled) {
+        const numToPick = Math.max(1, Math.floor(Math.random() * (maxFiles - minFiles + 1)) + minFiles);
+        filesToCommit = files.slice(0, numToPick); // Pick first N files simply
+    }
+
+    console.log(chalk.green(`Processing ${filesToCommit.length} file(s) out of ${files.length} changed...`));
     const spinner = ora('Committing files...').start();
 
     try {
-        // Add all files
-        await git.add('.');
-
-        // Generate message
-        // Format: "Update: file1, file2... and N others"
-        const fileNames = files.map(f => f.path);
-        let messageBody = '';
-        if (fileNames.length <= 2) {
-            messageBody = fileNames.join(', ');
-        } else {
-            messageBody = `${fileNames.slice(0, 2).join(', ')} and ${fileNames.length - 2} others`;
+        // Add specific files instead of '.'
+        for (const file of filesToCommit) {
+            await git.add(file.path);
         }
 
-        const commitMessage = `Update: ${messageBody}`;
+        // Generate message
+        const fileNames = filesToCommit.map(f => f.path);
+        const fileNameStr = fileNames.length <= 2
+            ? fileNames.join(', ')
+            : `${fileNames.slice(0, 2).join(', ')} and ${fileNames.length - 2} others`;
+
+        // Pick a template
+        const templates = config.messages.templates;
+        const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+        const commitMessage = randomTemplate.replace('{files}', fileNameStr);
 
         await git.commit(commitMessage);
         spinner.succeed(`Committed: ${commitMessage}`);

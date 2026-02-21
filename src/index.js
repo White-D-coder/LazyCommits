@@ -4,18 +4,31 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { checkGitStatus, processFiles, pushChanges, getBranches, checkoutBranch } from './gitLogic.js';
 import { stateManager } from './stateManager.js';
+import { configManager } from './config.js';
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function getRandomInterval() {
-    // Random interval between 20 and 45 minutes
-    // Converted to milliseconds
-    const minMinutes = 20;
-    const maxMinutes = 45;
+function getRandomInterval(config) {
+    const minMinutes = config.intervals.minMinutes;
+    const maxMinutes = config.intervals.maxMinutes;
     const minutes = Math.floor(Math.random() * (maxMinutes - minMinutes + 1) + minMinutes);
     return minutes * 60 * 1000;
+}
+
+function isWorkingHour(config) {
+    if (!config.workingHours.enabled) return true;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const dayOfWeek = now.getDay();
+
+    if (!config.workingHours.weekendsEnabled && (dayOfWeek === 0 || dayOfWeek === 6)) {
+        return false; // It's the weekend
+    }
+
+    return currentHour >= config.workingHours.startHour && currentHour < config.workingHours.endHour;
 }
 
 async function main() {
@@ -53,6 +66,15 @@ async function main() {
     }
 
     while (true) {
+        // Load config on each iteration to catch updates dynamically
+        const config = configManager.loadConfig();
+
+        if (!isWorkingHour(config)) {
+            console.log(chalk.yellow('\nCurrently outside of working hours. Pausing until next check...'));
+            await sleep(60 * 60 * 1000); // Sleep for 1 hour
+            continue;
+        }
+
         // 1. Check current status
         let files = await checkGitStatus();
 
@@ -101,7 +123,7 @@ async function main() {
         }
 
         // 4. Wait for random interval
-        const intervalMs = getRandomInterval();
+        const intervalMs = getRandomInterval(config);
         const nextTime = new Date(Date.now() + intervalMs).toLocaleTimeString();
         console.log(chalk.blue(`\nNext check scheduled for ${nextTime} (approx ${Math.round(intervalMs / 60000)} mins).`));
         await sleep(intervalMs);
