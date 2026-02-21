@@ -54,7 +54,7 @@ async function main() {
 
     const lastSeen = stateManager.getAnnouncementVersion();
     if (lastSeen !== currentVersion) {
-        console.log(chalk.magenta.bold(`\n🎉 Welcome to LazyCommits v${currentVersion}! 🎉`));
+        console.log(chalk.magenta.bold(`\n🎉 New Update is Here! Welcome to LazyCommits v${currentVersion}! 🎉`));
         console.log(chalk.cyan('--------------------------------------------------'));
         console.log(chalk.yellow('🚀 NEW FEATURES IN THIS RELEASE:'));
         console.log(chalk.white(' 1. ') + chalk.green('Smart File Chunking: ') + chalk.gray('Automatically commits 1-3 files at a time intelligently.'));
