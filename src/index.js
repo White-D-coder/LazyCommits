@@ -2,6 +2,9 @@
 import { program } from 'commander';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { checkGitStatus, processFiles, pushChanges, getBranches, checkoutBranch } from './gitLogic.js';
 import { stateManager } from './stateManager.js';
 import { configManager } from './config.js';
@@ -44,6 +47,23 @@ async function main() {
 
     // Initialize state
     stateManager.loadState();
+
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+    const currentVersion = pkg.version;
+
+    const lastSeen = stateManager.getAnnouncementVersion();
+    if (lastSeen !== currentVersion) {
+        console.log(chalk.magenta.bold(`\n🎉 Welcome to LazyCommits v${currentVersion}! 🎉`));
+        console.log(chalk.cyan('--------------------------------------------------'));
+        console.log(chalk.yellow('🚀 NEW FEATURES IN THIS RELEASE:'));
+        console.log(chalk.white(' 1. ') + chalk.green('Smart File Chunking: ') + chalk.gray('Automatically commits 1-3 files at a time intelligently.'));
+        console.log(chalk.white(' 2. ') + chalk.green('Working Hours: ') + chalk.gray('Pauses completely at night & weekends to protect your graph.'));
+        console.log(chalk.white(' 3. ') + chalk.green('Human Commits: ') + chalk.gray('Messages now look exactly like a real developer wrote them.'));
+        console.log(chalk.white(' 4. ') + chalk.green('Global Settings: ') + chalk.gray('Edit limits and templates at ~/.lazycommits/config.json'));
+        console.log(chalk.cyan('--------------------------------------------------\n'));
+        stateManager.setAnnouncementVersion(currentVersion);
+    }
 
     // Branch selection
     const branches = await getBranches();

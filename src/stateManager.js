@@ -43,8 +43,10 @@ export const stateManager = {
         if (state.date !== today) {
             // Preserve daemons across days
             const daemons = state.daemons || {};
+            const lastAnnouncementVersion = state.lastAnnouncementVersion || null;
             const newState = this.resetDaily();
             newState.daemons = daemons;
+            newState.lastAnnouncementVersion = lastAnnouncementVersion;
             this.saveState(newState);
             return newState;
         }
@@ -94,5 +96,16 @@ export const stateManager = {
         let state = this.loadState();
         state = this.checkAndResetIfNeeded(state);
         return state.daemons;
+    },
+
+    getAnnouncementVersion() {
+        let state = this.loadState();
+        return state.lastAnnouncementVersion || null;
+    },
+
+    setAnnouncementVersion(version) {
+        let state = this.loadState();
+        state.lastAnnouncementVersion = version;
+        this.saveState(state);
     }
 };
