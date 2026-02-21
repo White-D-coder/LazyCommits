@@ -30,11 +30,16 @@ const defaultConfig = {
         useAI: false,
         aiToken: '',
         templates: [
-            "Update: {files}",
-            "Refactor: adjusted {files}",
-            "Fix: resolved issues in {files}",
-            "Chore: general cleanup in {files}",
-            "Feat: progress on {files}"
+            "tweaked some things in {files}",
+            "refactored {files} a bit",
+            "fixed up the logic in {files}",
+            "cleaning up {files}",
+            "progress on {files}",
+            "styles and fixes for {files}",
+            "wip on {files}",
+            "typos and minor changes in {files}",
+            "working on {files} features",
+            "updated {files} to fix issues"
         ]
     },
     repositories: []
