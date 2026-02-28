@@ -27,7 +27,10 @@ function isWorkingHour(config) {
     const currentHour = now.getHours();
     const dayOfWeek = now.getDay();
 
-    if (!config.workingHours.weekendsEnabled && (dayOfWeek === 0 || dayOfWeek === 6)) {
+    // Always treat Saturday (6) and Sunday (0) as non-working days.
+    // This enforces the requirement that the tool is inactive on weekends
+    // regardless of user configuration.
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
         return false; // It's the weekend
     }
 
