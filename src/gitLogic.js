@@ -35,8 +35,27 @@ export async function processFiles(files) {
     const config = configManager.loadConfig();
     const { enabled, minFiles, maxFiles } = config.chunking;
 
+    // Filter out untracked files (these can be large sets like node_modules or build artifacts)
+    // simple-git status returns files with a `working_dir` or `index` marker; untracked files
+    // are typically marked with '?' in `working_dir`/`index`. We avoid staging those by default
+    // to prevent accidentally adding thousands of waste files when a new user runs the tool.
+    const trackedFiles = files.filter(f => {
+        // Some versions of simple-git populate `working_dir`/`index`; be defensive and treat
+        // '?' as untracked. If those properties are missing, assume it's tracked.
+        const working = Object.prototype.hasOwnProperty.call(f, 'working_dir') ? f.working_dir : undefined;
+        const index = Object.prototype.hasOwnProperty.call(f, 'index') ? f.index : undefined;
+
+        if (working === '?' || index === '?') return false; // skip untracked
+        return true;
+    });
+
+    if (trackedFiles.length === 0) {
+        console.log(chalk.yellow('No tracked files to process (untracked files are skipped).'));
+        return;
+    }
+
     // Determine how many files to pick
-    let filesToCommit = files;
+    let filesToCommit = trackedFiles;
     if (enabled) {
         const numToPick = Math.max(1, Math.floor(Math.random() * (maxFiles - minFiles + 1)) + minFiles);
         filesToCommit = files.slice(0, numToPick); // Pick first N files simply
